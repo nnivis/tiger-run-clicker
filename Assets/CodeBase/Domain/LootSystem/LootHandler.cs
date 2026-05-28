@@ -5,7 +5,7 @@ using VContainer;
 using TigerClicker.CodeBase.Domain.Buildings;
 using TigerClicker.CodeBase.Domain;
 using TigerClicker.CodeBase.Infrastructure;
-using TigerClicker.CodeBase.Logick;
+using TigerClicker.CodeBase.Logic;
 
 namespace TigerClicker.CodeBase.Domain.LootSystem
 {

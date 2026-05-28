@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
+using TigerClicker.CodeBase.Data;
 using TigerClicker.CodeBase.Domain;
 using TigerClicker.CodeBase.Infrastructure;
-using TigerClicker.CodeBase.Services.Visitors;
 
 namespace TigerClicker.CodeBase.Services.GameState
 {
@@ -10,8 +10,8 @@ namespace TigerClicker.CodeBase.Services.GameState
     {
         private readonly Wallet _wallet;
         private readonly IDataProvider _dataProvider;
+        private readonly IPersistentData _persistentData;
         private readonly PriceUpgrader _priceUpgrader;
-        private readonly PurchaseItemUpdater _purchaseItemUpdater;
         private readonly PurchaseItemContent _purchaseItemContent;
 
         private static readonly Dictionary<PurchaseItemType, CurrencyType> CurrencyMap =
@@ -21,13 +21,13 @@ namespace TigerClicker.CodeBase.Services.GameState
                 { PurchaseItemType.Buildings, CurrencyType.Coin },
             };
 
-        public PurchaseService(Wallet wallet, IDataProvider dataProvider, PriceUpgrader priceUpgrader,
-            PurchaseItemUpdater purchaseItemUpdater, PurchaseItemContent purchaseItemContent)
+        public PurchaseService(Wallet wallet, IDataProvider dataProvider, IPersistentData persistentData,
+            PriceUpgrader priceUpgrader, PurchaseItemContent purchaseItemContent)
         {
             _wallet = wallet;
             _dataProvider = dataProvider;
+            _persistentData = persistentData;
             _priceUpgrader = priceUpgrader;
-            _purchaseItemUpdater = purchaseItemUpdater;
             _purchaseItemContent = purchaseItemContent;
         }
 
@@ -41,7 +41,10 @@ namespace TigerClicker.CodeBase.Services.GameState
 
             _wallet.Spend(amount, currency);
             _priceUpgrader.Upgrade(type);
-            _purchaseItemUpdater.Visit(_purchaseItemContent.GetItemByType(type));
+
+            PurchaseItem item = _purchaseItemContent.GetItemByType(type);
+            _persistentData.PlayerData.UpdatePurchaseItemValue(type, item.PriceIncreaseCount);
+
             _dataProvider.Save();
             return true;
         }

@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using TigerClicker.CodeBase.Logick;
+using TigerClicker.CodeBase.Logic;
 
 namespace TigerClicker.CodeBase.Domain.Tiger
 {

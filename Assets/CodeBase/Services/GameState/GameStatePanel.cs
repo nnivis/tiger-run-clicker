@@ -1,7 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using TigerClicker.CodeBase.Services.Visitors;
 
 namespace TigerClicker.CodeBase.Services.GameState
 {
@@ -9,72 +8,60 @@ namespace TigerClicker.CodeBase.Services.GameState
     {
         public event Action<PurchaseItemType, int> OnBuyNotify;
         public event Action OnSpeedUpNotify;
+
         [SerializeField] private SpeedUpButton _speedUpButton;
         [SerializeField] private Transform _spawnParent;
         [SerializeField] private PurchaseItemViewFactory _purchaseItemViewFactory;
-        private PurchaseItemCheker _purchaseItemCheker;
-        private List<PurchaseItemView> _purchaseItemView = new List<PurchaseItemView>();
 
-        public void Initialize(PurchaseItemCheker purchaseItemCheker)
-        {
-            _purchaseItemCheker = purchaseItemCheker;
-        }
-        private void UpdatePurchaseItemStatus(PurchaseItemView purchaseItemView)
-        {
-            _purchaseItemCheker.Visit(purchaseItemView.PurchaseItem);
-            if (purchaseItemView.PurchaseItem.PriceIncreaseCount == purchaseItemView.PurchaseItem.PriceIncreaseCountLimit)
-            {
-                purchaseItemView.DeactivateItem();
-                purchaseItemView.OnBuyClick -= NotifyBuy;
-            }
-            else
-            {
-                purchaseItemView.ActiveItem();
-                 purchaseItemView.OnBuyClick += NotifyBuy;
-            }
-            purchaseItemView.UpdatePriceText();
-        }
-        private void Clear()
-        {
-            _speedUpButton.OnSpeedUpButtonClick -= NotifySpeedIncrease;
-            foreach (PurchaseItemView purchaseItemView in _purchaseItemView)
-            {
-                Destroy(purchaseItemView.gameObject);
-            }
-            _purchaseItemView.Clear();
-        }
-        private void NotifySpeedIncrease()
-        {
-            OnSpeedUpNotify();
-        }
+        private List<PurchaseItemView> _purchaseItemViews = new List<PurchaseItemView>();
 
-        private void NotifyBuy(PurchaseItemType type, int amount)
-        {
-            OnBuyNotify(type, amount);
-        }
         public void Show(IEnumerable<PurchaseItem> purchaseItems)
         {
             Clear();
             foreach (PurchaseItem purchaseItem in purchaseItems)
             {
-                PurchaseItemView spawnedPurchaseItemView = _purchaseItemViewFactory.Get(purchaseItem, _spawnParent);
-                _purchaseItemView.Add(spawnedPurchaseItemView);
-
-                UpdatePurchaseItemStatus(spawnedPurchaseItemView);
+                PurchaseItemView view = _purchaseItemViewFactory.Get(purchaseItem, _spawnParent);
+                _purchaseItemViews.Add(view);
+                UpdatePurchaseItemStatus(view);
             }
             _speedUpButton.OnSpeedUpButtonClick += NotifySpeedIncrease;
         }
 
         public void UpdatePurchaseItemView(PurchaseItemType purchaseItemType)
         {
-            foreach (PurchaseItemView purchaseItemView in _purchaseItemView)
-            {
-                if (purchaseItemView.PurchaseItem.PurchaseItemType == purchaseItemType)
-                {
-                    UpdatePurchaseItemStatus(purchaseItemView);
-                }
-            }
+            foreach (PurchaseItemView view in _purchaseItemViews)
+                if (view.PurchaseItem.PurchaseItemType == purchaseItemType)
+                    UpdatePurchaseItemStatus(view);
         }
 
+        private void UpdatePurchaseItemStatus(PurchaseItemView view)
+        {
+            bool isMaxed = view.PurchaseItem.PriceIncreaseCount >= view.PurchaseItem.PriceIncreaseCountLimit;
+
+            view.OnBuyClick -= NotifyBuy;
+
+            if (isMaxed)
+            {
+                view.DeactivateItem();
+            }
+            else
+            {
+                view.ActiveItem();
+                view.OnBuyClick += NotifyBuy;
+            }
+
+            view.UpdatePriceText();
+        }
+
+        private void Clear()
+        {
+            _speedUpButton.OnSpeedUpButtonClick -= NotifySpeedIncrease;
+            foreach (PurchaseItemView view in _purchaseItemViews)
+                Destroy(view.gameObject);
+            _purchaseItemViews.Clear();
+        }
+
+        private void NotifySpeedIncrease() => OnSpeedUpNotify?.Invoke();
+        private void NotifyBuy(PurchaseItemType type, int amount) => OnBuyNotify?.Invoke(type, amount);
     }
 }

@@ -6,7 +6,6 @@ using TigerClicker.CodeBase.Domain;
 using TigerClicker.CodeBase.Domain.LootSystem;
 using TigerClicker.CodeBase.Services.GameState;
 using TigerClicker.CodeBase.Services.StateMachine;
-using TigerClicker.CodeBase.Services.Visitors;
 
 namespace TigerClicker.CodeBase.Infrastructure
 {
@@ -24,8 +23,6 @@ namespace TigerClicker.CodeBase.Infrastructure
             builder.Register<Wallet>(Lifetime.Singleton);
 
             // Services
-            builder.Register<PurchaseItemCheker>(Lifetime.Singleton);
-            builder.Register<PurchaseItemUpdater>(Lifetime.Singleton);
             builder.Register<PriceUpgrader>(Lifetime.Singleton);
             builder.Register<PurchaseService>(Lifetime.Singleton);
             builder.RegisterInstance(_purchaseItemContent);

@@ -2,7 +2,6 @@ using UnityEngine;
 using TigerClicker.CodeBase.Data;
 using TigerClicker.CodeBase.Domain;
 using TigerClicker.CodeBase.Domain.Buildings;
-using TigerClicker.CodeBase.Services.Visitors;
 
 namespace TigerClicker.CodeBase.Services.GameState
 {
@@ -18,8 +17,7 @@ namespace TigerClicker.CodeBase.Services.GameState
         private bool _isInitialized;
 
         public void Initialize(Wallet wallet, PurchaseService purchaseService,
-            PurchaseItemCheker purchaseItemCheker, PurchaseItemContent purchaseItemContent,
-            IPersistentData persistentData)
+            PurchaseItemContent purchaseItemContent, IPersistentData persistentData)
         {
             if (_isInitialized) return;
             _isInitialized = true;
@@ -29,7 +27,6 @@ namespace TigerClicker.CodeBase.Services.GameState
             _persistentData = persistentData;
 
             _walletView.Initialize(wallet);
-            _gameStatePanel.Initialize(purchaseItemCheker);
             _gameStatePanel.OnBuyNotify += HandleBuy;
             _gameStatePanel.OnSpeedUpNotify += _entityManager.SpeedUpAll;
         }
@@ -37,7 +34,6 @@ namespace TigerClicker.CodeBase.Services.GameState
         public void StartWork()
         {
             var purchases = _persistentData.PlayerData.PurchaseItems;
-
             int tigerCount = purchases.TryGetValue(PurchaseItemType.Tiger, out int t) ? t : 1;
             int butcheryCount = purchases.TryGetValue(PurchaseItemType.Buildings, out int b) ? b : 1;
 

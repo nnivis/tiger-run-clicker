@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace TigerClicker.CodeBase.Services.StateMachine
 {
@@ -13,42 +14,35 @@ namespace TigerClicker.CodeBase.Services.StateMachine
             _states.ForEach(x => x.Init(this));
         }
 
-        public void Change<T>() where T : IStateMachine
-        {
-            Change(typeof(T));
-        }
+        public void Change<T>() where T : IStateMachine => Change(typeof(T));
 
         public void Change(System.Type typeNextState)
         {
             var nextState = _states.Find(x => x.GetType() == typeNextState);
-            if (nextState != null && _currentState != nextState)
-            {
-                if (_currentState != null)
-                {
-                    _currentState.Exit();
-                    foreach (var view in _currentState.GetViews())
-                    {
-                        view.SetActive(false);
-                    }
-                }
 
-                nextState.Enter();
-                foreach (var view in nextState.GetViews())
-                {
-                    view.SetActive(true);
-                }
-                _currentState = nextState;
+            if (nextState == null)
+            {
+                Debug.LogError($"StateMachine: state {typeNextState.Name} not found");
+                return;
             }
+
+            if (_currentState == nextState) return;
+
+            _currentState?.Exit();
+            foreach (var view in _currentState?.GetViews() ?? new List<UnityEngine.GameObject>())
+                view.SetActive(false);
+
+            nextState.Enter();
+            foreach (var view in nextState.GetViews())
+                view.SetActive(true);
+
+            _currentState = nextState;
         }
 
         public void Release()
         {
-            if (_currentState != null)
-            {
-                _currentState.Exit();
-                _currentState = null;
-            }
-
+            _currentState?.Exit();
+            _currentState = null;
             _states.Clear();
         }
     }
