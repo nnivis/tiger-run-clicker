@@ -21,7 +21,8 @@ namespace TigerClicker.CodeBase.Domain
 
         private void OnDestroy()
         {
-            _wallet.CurrencyChanged -= UpdateValues;
+            if (_wallet != null)
+                _wallet.CurrencyChanged -= UpdateValues;
         }
 
 

@@ -1,10 +1,9 @@
 ﻿using System;
-using UnityEngine;
 using TigerClicker.CodeBase.Data;
 
 namespace TigerClicker.CodeBase.Domain
 {
-    public class Wallet : MonoBehaviour
+    public class Wallet
     {
         public event Action<long, CurrencyType> CurrencyChanged;
         private IPersistentData _persistentData;

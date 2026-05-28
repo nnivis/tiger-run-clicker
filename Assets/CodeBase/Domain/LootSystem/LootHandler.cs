@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using VContainer;
 using TigerClicker.CodeBase.Domain.Buildings;
 using TigerClicker.CodeBase.Domain;
 using TigerClicker.CodeBase.Infrastructure;
@@ -16,13 +17,12 @@ namespace TigerClicker.CodeBase.Domain.LootSystem
         private IDataProvider _dataProvider;
         private Wallet _wallet;
 
-        public void Initialize(IDataProvider dataProvider, Wallet wallet)
+        [Inject]
+        public void Construct(IDataProvider dataProvider, Wallet wallet)
         {
             _dataProvider = dataProvider;
-
             _wallet = wallet;
             _gamePlayMediator.OnLootDropped += HandleBuildingCollision;
-
             InitializeLootGenerators();
         }
         private void InitializeLootGenerators()

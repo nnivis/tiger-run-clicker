@@ -9,7 +9,7 @@ namespace TigerClicker.CodeBase.Services.Visitors
         public PurchaseItemUpdater(IPersistentData persistentData) => _persistentData = persistentData;
         public void Visit(PurchaseItem purchaseItem)
         {
-            _persistentData.PlayerData.UpdatePurchaseItemValue(purchaseItem.PurchaseItemType, purchaseItem.PriceIncreaseCountLimit);
+            _persistentData.PlayerData.UpdatePurchaseItemValue(purchaseItem.PurchaseItemType, purchaseItem.PriceIncreaseCount);
         }
     }
 }

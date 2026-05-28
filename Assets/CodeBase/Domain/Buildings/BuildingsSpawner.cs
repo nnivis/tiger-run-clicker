@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace TigerClicker.CodeBase.Domain.Buildings
@@ -13,9 +12,7 @@ namespace TigerClicker.CodeBase.Domain.Buildings
         public Building SpawnBuilding(BuildingType buildingType)
         {
             if (_usedSpawnPoints.Count == 0)
-            {
-                throw new InvalidOperationException("No spawn points available.");
-            }
+                ResetSpawnPoints();
 
             int randomIndex = UnityEngine.Random.Range(0, _usedSpawnPoints.Count);
             Transform spawnPoint = _usedSpawnPoints[randomIndex];
